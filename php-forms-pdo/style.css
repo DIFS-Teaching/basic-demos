@@ -1,0 +1,42 @@
+/* Basic style for the demo */
+
+html {
+    font: 12pt Arial, sans-serif;
+    color: black;
+    background-color: white;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table td, table th {
+    border: 1px solid black;
+    padding: 0.3em 1em;
+}
+
+table td.action {
+    border: none;
+}
+
+.action a {
+    background-color: #ddf;
+    padding: 0.3em 0.5em;
+}
+
+form {
+    background-color: #ddd;
+    padding: 1.5em;
+    margin: 1em 0;
+    line-height: 2.5;
+}
+
+label {
+    font-weight: bold;
+    display: inline-block;
+    width: 6em;
+}
+
+footer {
+    margin-top: 1.5em;
+}
