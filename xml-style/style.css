@@ -1,0 +1,37 @@
+person {
+	float: left;
+	margin: 1em;
+	padding: 1em;
+	width: 10em;
+	border: 1px solid blue;
+	background-color: #eee;
+    box-shadow: 10px 10px 10px #555;
+}
+
+firstName, lastName {
+	font-weight: bold;
+    text-decoration: underline;
+}
+
+lastName {
+	text-transform: uppercase;
+}
+
+address, phoneNumbers {
+    display: block;
+    padding-left: 2em;
+    margin: 0.5em 0;
+}
+
+phoneNumbers item::before {
+    content: "Tel. ";
+}
+
+city, postalCode, state, streetAddress, item {
+    display: list-item;
+}
+
+description {
+    display: block;
+    font-style: italic;
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+<person>
+   <firstName>John</firstName>
+   <lastName>Smith</lastName>
+   <address>
+      <city>New York</city>
+      <postalCode>10021</postalCode>
+      <state>NY</state>
+      <streetAddress>21 2. street</streetAddress>
+   </address>
+   <phoneNumbers>
+      <item>212 555-1234</item>
+      <item>646 555-4567</item>
+   </phoneNumbers>
+   <description>Very important person</description>
+</person>
+<person>
+   <firstName>Jennifer</firstName>
+   <lastName>Lopez</lastName>
+   <address>
+      <city>Los Angeles</city>
+      <postalCode>10022</postalCode>
+      <state>CA</state>
+      <streetAddress>111 Hollywood</streetAddress>
+   </address>
+   <phoneNumbers>
+   </phoneNumbers>
+   <description>Also very important person</description>
+</person>
+</data>
