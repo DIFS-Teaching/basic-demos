@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive SVG</title>
+    <meta charset="utf-8">
+    <style>
+    </style>
+</head>
+<body>
+<h1>Interactive SVG</h1>
+
+<div class="container">
+    <svg height="120" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <circle id="svgC" cx="50" cy="50" r="50" fill="red" />
+        <rect id="svgR" x="120" y="20" height="60" width="60"
+                style="stroke:none; fill:#00ff00;
+                fill-opacity: 0.5;" />
+    </svg>
+</div>
+
+<p>(Try to move the mouse over the shapes)</p>
+
+<script type="text/javascript">
+
+document.getElementById('svgC').onmousemove = function(ev) {
+    //move the circle
+    var elemC = document.getElementById('svgC');
+    var newX = ev.clientX;
+    elemC.cx.baseVal.value = newX;
+    //check the rectangle
+    var cr = elemC.r.baseVal.value
+    var elemR = document.getElementById('svgR');
+    var x = elemR.x.baseVal.value;
+    if (newX + cr > x)
+        elemR.x.baseVal.value = newX + cr;
+}
+
+document.getElementById('svgR').onmousemove = function(ev) {
+    //move the rectangle
+    var elemR = document.getElementById('svgR');
+    var width = elemR.width.baseVal.value;
+    var newX = ev.clientX;
+    elemR.x.baseVal.value = newX - (width / 2);
+}
+
+</script>
+
+</body>
+</html>
