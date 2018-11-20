@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DOM Dump</title>
+    <meta charset="utf-8">
+    <style>
+        #result {
+            font-family: monospace;
+            border: 1px solid black;
+            background-color: #ddd;
+            min-height: 5em;
+        }
+        #startLink {
+            border: 1px solid blue;
+            background-color: #eef;
+            padding: 0.3em 0.5em;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>DOM Tree Dump</h1>
+<p>This demo prints a dump of the DOM tree.</p>
+<p><a href="#" id="startLink">Start!</a></p>
+<p>Result:</p>
+<div id="result">
+</div>
+
+<script type="text/javascript">
+
+var result = "";
+
+function print_node_info(node)
+{
+    if (node.nodeType == Node.ELEMENT_NODE)
+    {
+        result += "Element: &lt;" + node.tagName + "&gt;";
+    }
+    else if (node.nodeType == Node.TEXT_NODE)
+    {
+        result += "Text: '" + node.nodeValue + "'";
+    }
+    else
+    {
+        result += "(other node)";
+    }
+}
+
+function recursive_print_nodes(root)
+{
+    result += '<li>';
+    print_node_info(root);
+    result += '<ul>';
+    if (root.hasChildNodes())
+    {
+        var nodes = root.childNodes;
+		for (var i = 0; i < nodes.length; i++) {
+            recursive_print_nodes(nodes[i]);
+        }
+    }
+    result += '</ul>';
+    result += '</li>';
+}
+
+document.getElementById('startLink').onclick = function() {
+
+    document.getElementById('result').innerHTML = '';
+
+    result = '<ul>';
+    recursive_print_nodes(document.documentElement);
+    result += '</ul>';
+
+    document.getElementById('result').innerHTML = result;
+}
+
+</script>
+
+</body>
+</html>
