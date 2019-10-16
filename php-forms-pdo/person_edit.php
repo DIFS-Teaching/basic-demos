@@ -21,7 +21,7 @@ if (isset($_GET['name']) && isset($_GET['surname']))
     if ($serv->updatePerson($newperson))
         echo "<p>Person updated</p>";
     else
-        echo "<p>Error: " . mysqli_error($link) . "</p>";
+        echo "<p>Error: " . $serv->getErrorMessage() . "</p>";
 }
 
 $person = $serv->getPerson($id);
