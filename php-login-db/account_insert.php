@@ -10,8 +10,8 @@ make_header('New Account');
 $serv = new AccountService();
 
 $newperson = array(
-    'login' => $_GET['login'],
-    'password' => $_GET['password']
+    'login' => $_POST['login'],
+    'password' => $_POST['password']
 );
 
 $serv->addAccount($newperson);
