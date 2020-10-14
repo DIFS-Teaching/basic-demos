@@ -27,7 +27,7 @@ function make_footer()
 function redirect($dest)
 {
     $script = $_SERVER["PHP_SELF"];
-    if (strpos($dest,'/')) {
+    if (strpos($dest,'/') === 0) {
         $path = $dest;
     } else {
         $path = substr($script, 0, strrpos($script, '/')) . "/$dest";
