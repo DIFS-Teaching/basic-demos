@@ -1,0 +1,4 @@
+# This enables the PUT and DELETE methods
+<Limit GET HEAD POST PUT DELETE OPTIONS>
+Require all granted
+</Limit>
