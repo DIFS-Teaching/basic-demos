@@ -10,7 +10,10 @@ header('Access-Control-Allow-Headers: origin, x-csrftoken, content-type, accept,
 		
 //get the HTTP method, path and body of the request
 $method = $_SERVER['REQUEST_METHOD'];
-$params = explode('/', trim($_SERVER['PATH_INFO'], '/'));
+$params = [];
+if (isset($_SERVER['PATH_INFO'])) {
+    $params = explode('/', trim($_SERVER['PATH_INFO'], '/'));
+}
 
 $id = null;
 if (count($params) > 0 && strlen(trim($params[0])) > 0) {
