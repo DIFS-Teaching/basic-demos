@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="author" content="Radek Burget <burgetr@fit.vutbr.cz>">
+	<title>jQuery REST Client</title>
+	<style type="text/css">
+		  body {
+		    font-family: sans-serif;
+		  }
+		  th, td {
+		  	padding: 0.3em 0.5em;
+		  }
+		  th {
+		    text-align: left;
+		    background-color: #aaf;
+		  }
+		  td {
+		    background-color: #eee;
+		  }
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		function loadPeople(tab)
+		{
+		    jQuery.getJSON("users.php",
+			      function (data) {
+				  tab.empty();
+				  for (var i = 0; i < data.length; i++)
+				  {
+					  var row = "";
+					  row += '<td>' + data[i].id + '</td>';
+					  row += '<td>' + data[i].name + '</td>';
+					  row += '<td>' + data[i].surname + '</td>';
+					  tab.append('<tr>' + row + '</tr>');
+				  }
+			    }
+		    );
+		}
+	
+		function addPerson(person)
+		{
+			$.ajax({
+			    url: 'users.php',
+			    type: 'POST',
+			    data: JSON.stringify(person),
+			    contentType: 'application/json; charset=utf-8',
+			    dataType: 'json',
+			    async: false,
+			    success: function(msg) {
+			    	loadPeople($('#data'));
+			    }
+			});			
+		}
+		
+	
+		$(function() {
+			$('#reloadButton').click(function() {
+				var tab = $('#data');
+				loadPeople(tab);
+				return false;
+			});
+			$('#addForm').submit(function() {
+				person = new Object();
+				person.name = $('#name').val();
+				person.surname = $('#surname').val();
+				console.debug(JSON.stringify(person));
+				addPerson(person);
+				return false;
+			});
+		});
+	</script>  
+</head>
+<body>
+
+<h1>People</h1>
+
+<form>
+	<input type="button" value="Reload" id="reloadButton">
+</form>
+
+<table id="list">
+	<thead>
+		<tr><th>ID</th><th>Name</th><th>Surname</th></tr>
+	</thead>
+	<tbody id="data">
+		<!-- to be filled using AJAX -->
+	</tbody>
+</table>
+
+<h2>Add person</h2>
+<form action="#" method="post" id="addForm">
+	<label for="name">Name</label>
+	<input type="text" name="name" id="name"><br>
+	<label for="surname">Surname</label>
+	<input type="text" name="surname" id="surname"><br>
+	
+	<input type="submit" value="Submit" id="submitButton">
+</form>
+
+</body>
+</html>
