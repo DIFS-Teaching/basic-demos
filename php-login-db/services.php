@@ -54,7 +54,7 @@ class AccountService
     
     function getAccount($login)
     {
-        $stmt = $this->pdo->prepare('SELECT id, login, name password FROM accounts WHERE login = ?');
+        $stmt = $this->pdo->prepare('SELECT id, login, name, password FROM accounts WHERE login = ?');
         $stmt->execute([$login]);
         return $stmt->fetch();
     }
