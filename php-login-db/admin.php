@@ -11,7 +11,7 @@ $user = $accounts->getAccount($login);
 
 <h1>Admin page</h1>
 
-<p>Welcome, <b>{$user->name}</b> ($user->login)!</p>
+<p>Welcome, <b><?php echo $user['name']?></b>!</p>
 <p>You are now authorized to access this section.</p>
 
 <p><a href="index.php">Back to home page</a></p>
