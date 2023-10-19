@@ -7,12 +7,12 @@ make_header('Login');
 <h1>Login</h1>
 
 <?php
-$serv = new AccountService();
+$accounts = new AccountService();
 
 $login = $_POST['login'];
 $password = $_POST['password'];
 
-if ($serv->isValidAccount($login, $password))
+if ($accounts->isValidAccount($login, $password))
 {
     echo "<p>Login successful</p>";
     $_SESSION['user'] = $login;

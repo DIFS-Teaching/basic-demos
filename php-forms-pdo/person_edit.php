@@ -8,7 +8,7 @@ make_header('Edit Person');
 
 <?php
 $id = $_GET['id'];
-$serv = new PeopleService();
+$people = new PeopleService();
 
 if (isset($_GET['name']) && isset($_GET['surname']))
 {
@@ -18,13 +18,13 @@ if (isset($_GET['name']) && isset($_GET['surname']))
         'surname' => $_GET['surname']
     );
 
-    if ($serv->updatePerson($newperson))
+    if ($people->updatePerson($newperson))
         echo "<p>Person updated</p>";
     else
-        echo "<p>Error: " . $serv->getErrorMessage() . "</p>";
+        echo "<p>Error: " . $people->getErrorMessage() . "</p>";
 }
 
-$person = $serv->getPerson($id);
+$person = $people->getPerson($id);
 
 if ($person) {
 ?>

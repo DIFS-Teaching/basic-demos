@@ -1,8 +1,8 @@
 <?php
 require "common.php";
 
+make_header('Admin page');
 require_user();
-make_header('Home page');
 ?>
 
 <h1>Admin page</h1>

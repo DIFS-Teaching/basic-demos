@@ -7,14 +7,14 @@ make_header('New Person');
 <h1>New Person</h1>
 
 <?php
-$serv = new PeopleService();
+$people = new PeopleService();
 
 $newperson = array(
     'name' => $_GET['name'],
     'surname' => $_GET['surname']
 );
 
-$serv->addPerson($newperson);
+$people->addPerson($newperson);
 
 ?>
 <p>The new person has been inserted.</p>

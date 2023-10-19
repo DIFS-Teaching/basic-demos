@@ -18,7 +18,7 @@ function make_header($title)
 function make_footer()
 {
 ?>
-<footer>&copy; FIT 2019</footer>
+<footer>&copy; FIT 2023</footer>
 </body>
 </html>
 <?php

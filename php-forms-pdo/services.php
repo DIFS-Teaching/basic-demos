@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This class represents the part of data layer related to people.
+ * It simply implements the basic operations using PDO.
+ */
 class PeopleService
 {
     private $pdo;

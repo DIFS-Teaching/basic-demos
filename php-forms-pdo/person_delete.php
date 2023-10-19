@@ -8,15 +8,15 @@ make_header('Delete a Person');
 
 <?php
 
-$serv = new PeopleService();
+$people = new PeopleService();
 $id = $_GET['id'];
 
-$person = $serv->getPerson($id);
+$person = $people->getPerson($id);
 if ($person)
 {
     if (isset($_GET['confirmed']) && $_GET['confirmed'] == 'yes')
     {
-        $serv->deletePerson($id);
+        $people->deletePerson($id);
         ?>
         <p>The person has been deleted.</p>
         <p><a href="index.php">Back to the list</a></p>

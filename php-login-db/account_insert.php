@@ -7,14 +7,14 @@ make_header('New Account');
 <h1>Create New Account</h1>
 
 <?php
-$serv = new AccountService();
+$accounts = new AccountService();
 
 $newperson = array(
     'login' => $_POST['login'],
     'password' => $_POST['password']
 );
 
-$serv->addAccount($newperson);
+$accounts->addAccount($newperson);
 
 ?>
 <p>The new account has been created.</p>

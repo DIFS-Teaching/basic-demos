@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This class represents the part of data layer related to user identities.
+ * It simply implements the basic identity management using PDO.
+ */
 class AccountService
 {
     private $pdo;
