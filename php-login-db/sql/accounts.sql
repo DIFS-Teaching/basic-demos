@@ -29,7 +29,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `accounts` (
   `id` int(11) NOT NULL,
   `login` varchar(64) COLLATE utf8_czech_ci NOT NULL,
-  `password` varchar(128) COLLATE utf8_czech_ci NOT NULL
+  `password` varchar(128) COLLATE utf8_czech_ci NOT NULL,
+  `name` varchar(64) COLLATE utf8_czech_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
 
 --

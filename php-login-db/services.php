@@ -35,10 +35,11 @@ class AccountService
     
     function addAccount($data)
     {
-        $stmt = $this->pdo->prepare('INSERT INTO accounts (login, password) VALUES (?, ?)');
+        $stmt = $this->pdo->prepare('INSERT INTO accounts (login, password, name) VALUES (?, ?, ?)');
         $login = $data['login'];
+        $name = $data['name'];
         $pwd = password_hash($data['password'], PASSWORD_DEFAULT);
-        if ($stmt->execute([$login, $pwd]))
+        if ($stmt->execute([$login, $pwd, $name]))
         {
             $newid = $this->pdo->lastInsertId();
             $data['id'] = $newid;
@@ -53,7 +54,7 @@ class AccountService
     
     function getAccount($login)
     {
-        $stmt = $this->pdo->prepare('SELECT id, login, password FROM accounts WHERE login = ?');
+        $stmt = $this->pdo->prepare('SELECT id, login, name password FROM accounts WHERE login = ?');
         $stmt->execute([$login]);
         return $stmt->fetch();
     }

@@ -45,4 +45,8 @@ function require_user()
         make_footer();
         exit();
     }
+    else
+    {
+        return $_SESSION['user'];
+    }
 }

@@ -11,7 +11,8 @@ $accounts = new AccountService();
 
 $newperson = array(
     'login' => $_POST['login'],
-    'password' => $_POST['password']
+    'password' => $_POST['password'],
+    'name' => $_POST['name']
 );
 
 $accounts->addAccount($newperson);
