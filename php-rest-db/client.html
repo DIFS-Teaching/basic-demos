@@ -2,8 +2,9 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<meta name="author" content="Radek Burget <burgetr@fit.vutbr.cz>">
-	<title>jQuery REST Client</title>
+	<meta name="author" content="Radek Burget burgetr@fit.vutbr.cz">
+	<meta name="description" content="A simple client using pure JS">
+	<title>JavaScript REST Client</title>
 	<style type="text/css">
 		  body {
 		    font-family: sans-serif;
@@ -19,56 +20,51 @@
 		    background-color: #eee;
 		  }
 	</style>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 	<script type="text/javascript">
-		function loadPeople(tab)
+		async function loadPeople(tab)
 		{
-		    jQuery.getJSON("users.php",
-			      function (data) {
-				  tab.empty();
-				  for (var i = 0; i < data.length; i++)
-				  {
-					  var row = "";
-					  row += '<td>' + data[i].id + '</td>';
-					  row += '<td>' + data[i].name + '</td>';
-					  row += '<td>' + data[i].surname + '</td>';
-					  tab.append('<tr>' + row + '</tr>');
-				  }
-			    }
-		    );
+			const resp = await fetch("users.php", { method: 'GET' });
+			const data = await resp.json();
+
+			let tabHTML = "";
+			for (var i = 0; i < data.length; i++)
+			{
+				var row = "";
+				row += '<td>' + data[i].id + '</td>';
+				row += '<td>' + data[i].name + '</td>';
+				row += '<td>' + data[i].surname + '</td>';
+				tabHTML += '<tr>' + row + '</tr>';
+			}
+			tab.innerHTML = tabHTML;
 		}
 	
-		function addPerson(person)
+		async function addPerson(person)
 		{
-			$.ajax({
-			    url: 'users.php',
-			    type: 'POST',
-			    data: JSON.stringify(person),
-			    contentType: 'application/json; charset=utf-8',
-			    dataType: 'json',
-			    async: false,
-			    success: function(msg) {
-			    	loadPeople($('#data'));
-			    }
-			});			
+			await fetch("users.php", {
+				method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(person)
+			});
+			loadPeople(document.getElementById('data'));
 		}
-		
-	
-		$(function() {
-			$('#reloadButton').click(function() {
-				var tab = $('#data');
+
+		window.onload = function() {
+			document.getElementById('reloadButton').onclick = function() {
+				let tab = document.getElementById('data');
 				loadPeople(tab);
 				return false;
-			});
-			$('#addForm').submit(function() {
-				person = new Object();
-				person.name = $('#name').val();
-				person.surname = $('#surname').val();
+			}
+			document.getElementById('addForm').onsubmit = function(event) {
+				event.preventDefault();
+				const person = {
+					name: document.getElementById('name').value,
+					surname: document.getElementById('surname').value
+				};
 				console.debug(JSON.stringify(person));
 				addPerson(person);
 				return false;
-			});
-		});
+			}
+		}
 	</script>  
 </head>
 <body>
