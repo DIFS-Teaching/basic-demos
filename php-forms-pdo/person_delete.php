@@ -9,16 +9,19 @@ make_header('Delete a Person');
 <?php
 
 $people = new PeopleService();
-$id = $_GET['id'];
+$id = intval($_GET['id'] ?? 0); // convert to int to avoid SQL injection, use 0 (invalid id) if not set
 
 $person = $people->getPerson($id);
 if ($person)
 {
-    if (isset($_GET['confirmed']) && $_GET['confirmed'] == 'yes')
+    if ($_SERVER['REQUEST_METHOD'] === 'POST')
     {
-        $people->deletePerson($id);
+        check_csrf();
+        if ($people->deletePerson($id))
+            echo "<p>The person has been deleted.</p>";
+        else
+            echo "<p>Error: " . $people->getErrorMessage() . "</p>";
         ?>
-        <p>The person has been deleted.</p>
         <p><a href="index.php">Back to the list</a></p>
         <?php
     }
@@ -26,12 +29,13 @@ if ($person)
     {
         ?>
         <p>Do you really want to delete
-            <strong><?php echo $person['name'] . ' ' . $person['surname'];?></strong>?
+            <strong><?php echo h($person['name'] . ' ' . $person['surname']);?></strong>?
         </p>
-        <p class="action">
-        <a href="person_delete.php?confirmed=yes&amp;id=<?php echo $id?>">yes</a>
-        <a href="index.php">no</a>
-        </p>
+        <form action="person_delete.php?id=<?php echo $id?>" method="post" class="action">
+            <?php csrf_field(); ?>
+            <input type="submit" value="yes">
+            <a href="index.php">no</a>
+        </form>
         <?php
     }
 }

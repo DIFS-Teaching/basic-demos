@@ -5,7 +5,8 @@ make_header('New Person');
 
 <h1>New Person</h1>
 
-<form action="person_insert.php" method="get">
+<form action="person_insert.php" method="post">
+    <?php csrf_field(); ?>
     <label for="name">Name</label>
     <input type="text" name="name" id="name"><br>
     

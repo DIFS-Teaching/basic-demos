@@ -7,15 +7,16 @@ make_header('Edit Person');
 <h1>Edit Person</h1>
 
 <?php
-$id = $_GET['id'];
+$id = intval($_GET['id'] ?? 0);
 $people = new PeopleService();
 
-if (isset($_GET['name']) && isset($_GET['surname']))
+if ($_SERVER['REQUEST_METHOD'] === 'POST')
 {
-   $newperson = array(
+    check_csrf();
+    $newperson = array(
         'id' => $id,
-        'name' => $_GET['name'],
-        'surname' => $_GET['surname']
+        'name' => $_POST['name'] ?? '',
+        'surname' => $_POST['surname'] ?? ''
     );
 
     if ($people->updatePerson($newperson))
@@ -29,15 +30,14 @@ $person = $people->getPerson($id);
 if ($person) {
 ?>
 
-    <form action="person_edit.php" method="get">
-        <input type="hidden" name="id"
-            value="<?php echo $id;?>">
+    <form action="person_edit.php?id=<?php echo $id;?>" method="post">
+        <?php csrf_field(); ?>
         <label for="name">Name</label>
         <input type="text" name="name" id="name"
-            value="<?php echo $person['name']; ?>"><br>
+            value="<?php echo h($person['name']); ?>"><br>
         <label for="surname">Surname</label>
         <input type="text" name="surname" id="surname"
-            value="<?php echo $person['surname']; ?>"><br>
+            value="<?php echo h($person['surname']); ?>"><br>
 
         <input type="submit" value="Save">
     </form>

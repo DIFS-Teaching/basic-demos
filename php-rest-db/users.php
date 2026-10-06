@@ -8,6 +8,15 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: origin, x-csrftoken, content-type, accept, x-requested-with');
 		
+//reads the person data from the JSON request body; only the expected fields are used
+function read_person()
+{
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($data) || !is_string($data['name'] ?? null) || !is_string($data['surname'] ?? null))
+        return null;
+    return ['name' => $data['name'], 'surname' => $data['surname']];
+}
+
 //get the HTTP method, path and body of the request
 $method = $_SERVER['REQUEST_METHOD'];
 $params = [];
@@ -28,7 +37,7 @@ $rdata = [];
 switch ($method) {
     case 'GET':
         if ($id === null) {
-            $rdata = $people->getPeople()->fetchAll(PDO::FETCH_ASSOC);
+            $rdata = $people->getPeople()->fetchAll();
         } else {
             $rdata = $people->getPerson($id);
             if ($rdata === false) {
@@ -39,7 +48,12 @@ switch ($method) {
         break;
 
     case 'POST':
-        $person = json_decode(file_get_contents('php://input'), true);
+        $person = read_person();
+        if ($person === null) {
+            $rdata = ['error' => 'name and surname required'];
+            $rcode = 400; //bad request
+            break;
+        }
         $rdata = $people->addPerson($person);
         if ($rdata !== false) {
             $rcode = 201; //created
@@ -51,7 +65,12 @@ switch ($method) {
         
     case 'PUT':
         if ($id !== null) {
-            $person = json_decode(file_get_contents('php://input'), true);
+            $person = read_person();
+            if ($person === null) {
+                $rdata = ['error' => 'name and surname required'];
+                $rcode = 400; //bad request
+                break;
+            }
             $person['id'] = $id;
             if ($people->updatePerson($person)) {
                 $rdata = ['result' => 'ok'];
@@ -78,7 +97,13 @@ switch ($method) {
             $rcode = 400; //bad request
         }
         break;
-        
+
+    case 'OPTIONS': //CORS preflight request, the headers above are sufficient
+        break;
+
+    default:
+        $rdata = ['error' => 'method not allowed'];
+        $rcode = 405; //method not allowed
 }
 
 //send the JSON result

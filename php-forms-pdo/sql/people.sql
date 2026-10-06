@@ -1,11 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 4.6.6deb5
--- https://www.phpmyadmin.net/
---
--- Počítač: localhost:3306
--- Vytvořeno: Čtv 18. říj 2018, 10:51
--- Verze serveru: 5.7.23-2
--- Verze PHP: 7.0.31-1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -27,10 +19,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `name` varchar(64) COLLATE utf8_czech_ci NOT NULL,
-  `surname` varchar(64) COLLATE utf8_czech_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
+  `id` int NOT NULL,
+  `name` varchar(64) COLLATE utf8mb4_czech_ci NOT NULL,
+  `surname` varchar(64) COLLATE utf8mb4_czech_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 
 --
 -- Klíče pro exportované tabulky
@@ -50,7 +42,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pro tabulku `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

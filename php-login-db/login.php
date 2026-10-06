@@ -7,14 +7,16 @@ make_header('Login');
 <h1>Login</h1>
 
 <?php
+check_csrf();
 $accounts = new AccountService();
 
-$login = $_POST['login'];
-$password = $_POST['password'];
+$login = $_POST['login'] ?? '';
+$password = $_POST['password'] ?? '';
 
 if ($accounts->isValidAccount($login, $password))
 {
     echo "<p>Login successful</p>";
+    session_regenerate_id(true); // new session ID after login (prevents session fixation)
     $_SESSION['user'] = $login;
 }
 else

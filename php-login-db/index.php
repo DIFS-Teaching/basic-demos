@@ -9,7 +9,7 @@ make_header('Home Page');
 <?php
 if (isset($_SESSION['user']))
 {
-    echo "Current user: <strong>" . $_SESSION['user'] . '</strong>';
+    echo "Current user: <strong>" . h($_SESSION['user']) . '</strong>';
     echo '<p><a href="admin.php">Go to admin page</a>';
     echo '<p><a href="logout.php">Logout</a>';
 }
@@ -18,6 +18,7 @@ else
 ?>
     <div>
         <form action="login.php" method="post">
+            <?php csrf_field(); ?>
             <label for="login">Login</label>
             <input type="text" name="login" id="login"><br>
             

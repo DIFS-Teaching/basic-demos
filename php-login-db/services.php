@@ -17,10 +17,13 @@ class AccountService
 
     function connect_db()
     {
-        $dsn = 'mysql:host=localhost;dbname=people';
+        $dsn = 'mysql:host=localhost;dbname=people;charset=utf8mb4';
         $username = 'demo';
         $password = 'demo';
-        $options = array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8');
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // the default since PHP 8.0
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ];
         $pdo = new PDO($dsn, $username, $password, $options);
         return $pdo;
     }
@@ -30,7 +33,7 @@ class AccountService
         if ($this->lastError === NULL)
             return '';
         else
-            return $this->lastError[2]; //the message
+            return $this->lastError;
     }
     
     function addAccount($data)
@@ -39,15 +42,20 @@ class AccountService
         $login = $data['login'];
         $name = $data['name'];
         $pwd = password_hash($data['password'], PASSWORD_DEFAULT);
-        if ($stmt->execute([$login, $pwd, $name]))
+        try
         {
+            $stmt->execute([$login, $pwd, $name]);
             $newid = $this->pdo->lastInsertId();
             $data['id'] = $newid;
             return $data;
         }
-        else
+        catch (PDOException $e)
         {
-            $this->lastError = $stmt->errorInfo();
+            error_log($e->getMessage()); // details go to the server log, not to the user
+            if ($e->getCode() == 23000) // integrity constraint violation
+                $this->lastError = 'This login is already taken.';
+            else
+                $this->lastError = 'Database operation failed.';
             return FALSE;
         }
     }
@@ -62,6 +70,8 @@ class AccountService
     function isValidAccount($login, $password)
     {
         $data = $this->getAccount($login);
+        if ($data === FALSE) // no such account
+            return FALSE;
         return password_verify($password, $data['password']);
     }
 

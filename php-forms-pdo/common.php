@@ -10,7 +10,7 @@ function make_header($title)
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <link rel="stylesheet" type="text/css" href="style.css">
-  <title><?php echo $title;?></title>
+  <title><?php echo h($title);?></title>
 </head>
 <body>
 <?php
@@ -19,7 +19,7 @@ function make_header($title)
 function make_footer()
 {
 ?>
-<footer>&copy; FIT 2018</footer>
+<footer>&copy; FIT 2026</footer>
 </body>
 </html>
 <?php
@@ -33,9 +33,8 @@ function redirect($dest)
     } else {
         $path = substr($script, 0, strrpos($script, '/')) . "/$dest";
     }
-    $name = $_SERVER["SERVER_NAME"];
-    header("HTTP/1.1 301 Moved Permanently");
-    header("Location: http://$name$path");
+    header("Location: $path", true, 303); // 303 See Other
+    exit(); // stop the script - no more output after redirect
 }
 
 function require_user()
@@ -43,6 +42,49 @@ function require_user()
     if (!isset($_SESSION['user']))
     {
         echo "<h1>Access forbidden</h1>";
+        make_footer();
+        exit();
+    }
+}
+
+/**
+ * Escapes a string for safe use in HTML output (prevents XSS).
+ */
+function h($s)
+{
+    return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Returns the CSRF token of the current session (generates a new one when necessary).
+ */
+function csrf_token()
+{
+    if (!isset($_SESSION['csrf_token']))
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Prints a hidden form field containing the CSRF token.
+ */
+function csrf_field()
+{
+    echo '<input type="hidden" name="csrf_token" value="' . csrf_token() . '">';
+}
+
+/**
+ * Checks that the request is a POST request with a valid CSRF token.
+ * Stops the script otherwise.
+ */
+function check_csrf()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST'
+        || !isset($_POST['csrf_token'])
+        || !hash_equals(csrf_token(), $_POST['csrf_token']))
+    {
+        http_response_code(403);
+        echo "<h1>Invalid request</h1>";
         make_footer();
         exit();
     }

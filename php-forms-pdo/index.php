@@ -17,8 +17,8 @@ $rows = $serv->getPeople();
 while ($row = $rows->fetch())
 {
     echo "<tr>";
-    echo "<td>" . $row['name'] . "</td>";
-    echo "<td>" . $row['surname'] . "</td>";
+    echo "<td>" . h($row['name']) . "</td>";
+    echo "<td>" . h($row['surname']) . "</td>";
     echo '<td class="action">';
     $id = $row['id'];
     echo "<a href=\"person_edit.php?id=$id\">edit</a> ";

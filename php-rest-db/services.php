@@ -13,10 +13,13 @@ class PeopleService
 
     function connect_db()
     {
-        $dsn = 'mysql:host=localhost;dbname=people';
+        $dsn = 'mysql:host=localhost;dbname=people;charset=utf8mb4';
         $username = 'demo';
         $password = 'demo';
-        $options = array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8');
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // the default since PHP 8.0
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ];
         $pdo = new PDO($dsn, $username, $password, $options);
         return $pdo;
     }
@@ -26,7 +29,7 @@ class PeopleService
         if ($this->lastError === NULL)
             return '';
         else
-            return $this->lastError[2]; //the message
+            return $this->lastError;
     }
     
     function getPeople()
@@ -45,15 +48,17 @@ class PeopleService
     function addPerson($data)
     {
         $stmt = $this->pdo->prepare('INSERT INTO users (name, surname) VALUES (:name, :surname)');
-        if ($stmt->execute($data))
+        try
         {
+            $stmt->execute($data);
             $newid = $this->pdo->lastInsertId();
             $data['id'] = $newid;
             return $data;
         }
-        else
+        catch (PDOException $e)
         {
-            $this->lastError = $stmt->errorInfo();
+            error_log($e->getMessage()); // details go to the server log, not to the user
+            $this->lastError = 'Database operation failed.';
             return FALSE;
         }
     }
@@ -61,13 +66,15 @@ class PeopleService
     function updatePerson($data)
     {
         $stmt = $this->pdo->prepare('UPDATE users SET name = :name, surname = :surname WHERE id = :id');
-        if ($stmt->execute($data))
+        try
         {
+            $stmt->execute($data);
             return TRUE;
         }
-        else
+        catch (PDOException $e)
         {
-            $this->lastError = $stmt->errorInfo();
+            error_log($e->getMessage()); // details go to the server log, not to the user
+            $this->lastError = 'Database operation failed.';
             return FALSE;
         }
     }
@@ -75,13 +82,15 @@ class PeopleService
     function deletePerson($id)
     {
         $stmt = $this->pdo->prepare('DELETE FROM users WHERE id = ?');
-        if ($stmt->execute([$id]))
+        try
         {
+            $stmt->execute([$id]);
             return TRUE;
         }
-        else
+        catch (PDOException $e)
         {
-            $this->lastError = $stmt->errorInfo();
+            error_log($e->getMessage()); // details go to the server log, not to the user
+            $this->lastError = 'Database operation failed.';
             return FALSE;
         }
     }
