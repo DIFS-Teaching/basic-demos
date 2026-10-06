@@ -1,31 +1,27 @@
 <?php
 
 /**
- * This class represents the part of data layer related to user identities.
- * It simply implements the basic identity management using PDO.
+ * BUSINESS LAYER
+ *
+ * User account management used by the presentation layer (the pages).
+ * Implements the application rules (data validation, password hashing
+ * and verification) and uses the data layer (AccountRepository) for storing
+ * the accounts. It never uses SQL directly.
  */
+
+require_once "data.php";
+
 class AccountService
 {
-    private $pdo;
+    const MIN_PASSWORD_LENGTH = 8;
+
+    private $accounts; // AccountRepository from the data layer
     private $lastError;
-    
+
     function __construct()
     {
-        $this->pdo = $this->connect_db();
+        $this->accounts = new AccountRepository(db_connect());
         $this->lastError = NULL;
-    }
-
-    function connect_db()
-    {
-        $dsn = 'mysql:host=localhost;dbname=people;charset=utf8mb4';
-        $username = 'demo';
-        $password = 'demo';
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // the default since PHP 8.0
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ];
-        $pdo = new PDO($dsn, $username, $password, $options);
-        return $pdo;
     }
 
     function getErrorMessage()
@@ -35,44 +31,81 @@ class AccountService
         else
             return $this->lastError;
     }
-    
+
+    /**
+     * Creates a new account. Returns the account data (without the password)
+     * or FALSE on error.
+     */
     function addAccount($data)
     {
-        $stmt = $this->pdo->prepare('INSERT INTO accounts (login, password, name) VALUES (?, ?, ?)');
-        $login = $data['login'];
-        $name = $data['name'];
-        $pwd = password_hash($data['password'], PASSWORD_DEFAULT);
+        $login = trim($data['login'] ?? '');
+        $name = trim($data['name'] ?? '');
+        $password = $data['password'] ?? '';
+        if ($login === '' || $name === '')
+        {
+            $this->lastError = 'Login and name are required.';
+            return FALSE;
+        }
+        if (strlen($password) < self::MIN_PASSWORD_LENGTH)
+        {
+            $this->lastError = 'The password must have at least ' . self::MIN_PASSWORD_LENGTH . ' characters.';
+            return FALSE;
+        }
+
+        $hash = password_hash($password, PASSWORD_DEFAULT);
         try
         {
-            $stmt->execute([$login, $pwd, $name]);
-            $newid = $this->pdo->lastInsertId();
-            $data['id'] = $newid;
-            return $data;
+            $id = $this->accounts->insert($login, $hash, $name);
+            return ['id' => $id, 'login' => $login, 'name' => $name];
         }
         catch (PDOException $e)
         {
             error_log($e->getMessage()); // details go to the server log, not to the user
-            if ($e->getCode() == 23000) // integrity constraint violation
+            if ($e->getCode() == 23000) // integrity constraint violation (unique login)
                 $this->lastError = 'This login is already taken.';
             else
                 $this->lastError = 'Database operation failed.';
             return FALSE;
         }
     }
-    
-    function getAccount($login)
-    {
-        $stmt = $this->pdo->prepare('SELECT id, login, name, password FROM accounts WHERE login = ?');
-        $stmt->execute([$login]);
-        return $stmt->fetch();
-    }
-    
+
+    /**
+     * Checks the login and password. When the password hash was created with
+     * older algorithm or parameters, it is recomputed and stored.
+     */
     function isValidAccount($login, $password)
     {
-        $data = $this->getAccount($login);
-        if ($data === FALSE) // no such account
+        $account = $this->accounts->findByLogin($login);
+        if ($account === FALSE) // no such account
             return FALSE;
-        return password_verify($password, $data['password']);
+        if (!password_verify($password, $account['password']))
+            return FALSE;
+
+        if (password_needs_rehash($account['password'], PASSWORD_DEFAULT))
+        {
+            try
+            {
+                $hash = password_hash($password, PASSWORD_DEFAULT);
+                $this->accounts->updatePasswordHash($account['id'], $hash);
+            }
+            catch (PDOException $e)
+            {
+                error_log($e->getMessage()); // not critical, the old hash is still valid
+            }
+        }
+        return TRUE;
     }
 
+    /**
+     * Returns the account data for the presentation layer.
+     * The password hash is not included, the pages do not need it.
+     */
+    function getAccount($login)
+    {
+        $account = $this->accounts->findByLogin($login);
+        if ($account === FALSE)
+            return FALSE;
+        unset($account['password']);
+        return $account;
+    }
 }

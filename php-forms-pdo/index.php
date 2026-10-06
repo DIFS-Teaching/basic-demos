@@ -12,9 +12,7 @@ make_header('List of People');
 
 $serv = new PeopleService();
 
-$rows = $serv->getPeople();
-
-while ($row = $rows->fetch())
+foreach ($serv->getPeople() as $row)
 {
     echo "<tr>";
     echo "<td>" . h($row['name']) . "</td>";

@@ -9,12 +9,13 @@ header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: origin, x-csrftoken, content-type, accept, x-requested-with');
 		
 //reads the person data from the JSON request body; only the expected fields are used
+//(the data is validated by the business layer)
 function read_person()
 {
     $data = json_decode(file_get_contents('php://input'), true);
-    if (!is_array($data) || !is_string($data['name'] ?? null) || !is_string($data['surname'] ?? null))
+    if (!is_array($data))
         return null;
-    return ['name' => $data['name'], 'surname' => $data['surname']];
+    return ['name' => (string) ($data['name'] ?? ''), 'surname' => (string) ($data['surname'] ?? '')];
 }
 
 //get the HTTP method, path and body of the request
@@ -37,7 +38,7 @@ $rdata = [];
 switch ($method) {
     case 'GET':
         if ($id === null) {
-            $rdata = $people->getPeople()->fetchAll();
+            $rdata = $people->getPeople();
         } else {
             $rdata = $people->getPerson($id);
             if ($rdata === false) {
@@ -50,7 +51,7 @@ switch ($method) {
     case 'POST':
         $person = read_person();
         if ($person === null) {
-            $rdata = ['error' => 'name and surname required'];
+            $rdata = ['error' => 'invalid JSON data'];
             $rcode = 400; //bad request
             break;
         }
@@ -58,7 +59,7 @@ switch ($method) {
         if ($rdata !== false) {
             $rcode = 201; //created
         } else {
-            $rdata = ['error' => 'couldn\'t insert'];
+            $rdata = ['error' => $people->getErrorMessage()];
             $rcode = 400; //bad request
         }
         break;
@@ -67,7 +68,7 @@ switch ($method) {
         if ($id !== null) {
             $person = read_person();
             if ($person === null) {
-                $rdata = ['error' => 'name and surname required'];
+                $rdata = ['error' => 'invalid JSON data'];
                 $rcode = 400; //bad request
                 break;
             }
@@ -75,7 +76,7 @@ switch ($method) {
             if ($people->updatePerson($person)) {
                 $rdata = ['result' => 'ok'];
             } else {
-                $rdata = ['error' => 'update failed'];
+                $rdata = ['error' => $people->getErrorMessage()];
                 $rcode = 400; //bad request
             }
         } else {
@@ -89,7 +90,7 @@ switch ($method) {
             if ($people->deletePerson($id)) {
                 $rdata = ['result' => 'ok'];
             } else {
-                $rdata = ['error' => 'delete failed'];
+                $rdata = ['error' => $people->getErrorMessage()];
                 $rcode = 400; //bad request
             }
         } else {
